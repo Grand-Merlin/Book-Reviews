@@ -1,0 +1,56 @@
+##############Dans Tinker###################
+    Lazy loading : pour les petit jeux de données
+$book = \App\Models\Book::find(42);                         retourne le livre specifier par son id
+$reviews = $book->reviews;                                  retourne toutes les critiques pour ce livre
+
+    Eager loading : pour les gros jeux de données
+\App\Models\Book::with('reviews')-> find(42)                Exactement le meme que les deux precedent mais en une ligne
+                                                            reviews est le nom de la relation définie dans le modele Book
+$books = \App\Models\Book::with('reviews')->take(3)->get(); recupere les trois premiers livre dans la db avec toutes leurs critique associée
+
+    Ajouter une critique pour un livre spécifique
+$book = \App\Models\Book::find(1);
+$review = new \App\Models\Review();
+$review->review = 'This was fine';
+$review->rating = 3;
+$book->reviews()->save($review);
+
+    Voire cette nouvelle critique
+$book = \App\Models\Book::find(1);
+$book->reviews; 
+
+    autre methode pour ajouter une critique
+$review = $book->reviews()->create(['review' => 'Sample review', 'rating' => 5]);
+
+    charger un livre depuis une critique
+$review->book
+
+    chercher tous les titre de livre avec un mot dans le titre
+App\Models\Book::where('title', 'LIKE', '%mot_recherché%')->get();
+
+    Tester une methode de portée avec Tinker, ici les requete SQL de la classe Builder
+\App\Models\Book::title('natus')->get();
+\App\Models\Book::popular()->toSql();
+> \App\Models\Book::popular()->highestRated()->toSql();
+
+    Exemple de chaînage de methode Builder
+\App\Models\Book::title('natus')->where('create_at', '>', '2023-01-01')->get();
+
+    Pour voir la requete générée par Builder
+\App\Models\Book::title('natus')->where('create_at', '>', '2023-01-01')->toSql();
+
+
+    Compter le nombre d'enregistrement du modele Book avec une colone supplementaire, comptant le nombre de critiques
+\App\Models\Book::withCount('reviews')->get();
+    Meme chose que precedeemnt mais latest = decroissant (p/r created_at) et limite les resultats au 3 livres les plus recent
+\App\Models\Book::withCount('reviews')->latest()->limit(3)->get();
+
+    L'ordre d'appel de fonction est important sauf pour les fonction d'agregat, on px les mettre dans n'importe quelle ordre car ces fonction effectue
+    une operation sur l'ensemble du resultats
+
+------------------------------------------------------------------------------------------------
+    Creation d'un crontroleur "ressourceful" (avec le CRUD)
+php artisan make:controller BookController --resource
+
+
+
