@@ -22,19 +22,39 @@ class BookController extends Controller
     //     })->get();
     // }
     /* #endregion */
+
     /* #region V2 */
     public function index(Request $request)
     {
+        // Recupere la valeur du paramettre 'title' de la requete HTTP et la stock dans la variable $title
         $title = $request->input('title');
-        $books = Book::when($title, fn ($query, $title) => $query->title($title))->get();
-        // Le ressource controlleur genere les route automatiqument en suivant une convention de nomage nom action.
-        // Il est recommander de nomer les vue de la meme maniere que les routes. Ex book.index : index.blade.php
-        //                                                                           book.show  : show.blade.php
-        //                                                                           etc...
+        // Recuper la valeur du paramettre 'filter' et si il n'y en a pas, la variable $filter sera une chaine vide
+        $filter = $request->input('filter', '');
 
-        // On redirige vers la route books.index en passant en parametre un tableau associatif clé valeur.
-        // books est le nom de la variable
-        // $books est la valeur (cretenement une collection d'objet prise dans la DB)
+        /* #region V1 */
+        // $books = Book::when($title, fn ($query, $title) => $query->title($title))->get();
+        // // Le ressource controlleur genere les route automatiqument en suivant une convention de nomage nom action.
+        // // Il est recommander de nomer les vue de la meme maniere que les routes. Ex book.index : index.blade.php
+        // //                                                                           book.show  : show.blade.php
+        // //                                                                           etc...
+
+        // // On redirige vers la route books.index en passant en parametre un tableau associatif clé valeur.
+        // // books est le nom de la variable
+        // // $books est la valeur (cretenement une collection d'objet prise dans la DB)
+        // return view('books.index', ['books' => $books]);
+        /* #endregion */
+        
+        $books = Book::when($title, fn($query, $title) => $query->title($title));
+        // Match est une expression qui ici, compare la valeur de la variable $filter avec les proposition et renvoie une valeur.
+        // Celle ci est assignée a la variable $books
+        $books = match ($filter) {
+            'popular_last_month' => $books->popularLastMonth(),
+            'popular_last_6months' => $books->popularLast6Months(),
+            'highest_rated_last_month' => $books->highestRatedLastMonth(),
+            'highest_rated_last_6months' => $books->highestRatedLast6Months(),
+            default => $books->latest()
+        };
+        $books=$books->get();
         return view('books.index', ['books' => $books]);
     }
     /* #endregion */
