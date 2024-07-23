@@ -48,6 +48,8 @@
     </div>
 
     <ul>
+      {{-- @forelse est une directive Blade qui permet de parcourir une collection et de gérer le cas où la collection est vide. --}}
+      {{-- la collection $books vient d'etre crée dans le Controller --}}
         @forelse ($books as $book)
         <li class="mb-4">
             <div class="book-item">
@@ -74,7 +76,7 @@
         @empty
         <li class="mb-4">
             <div class="empty-book-item">
-              <p class="empty-text">No books found</p>
+              <p class="empty-text">Pas de livre trouvé</p>
               {{-- ce lien renvoie vers une page sans filtre (Index est un bon choix) --}}
               <a href="{{route('books.index')}}" class="reset-link">Reset criteria</a>
             </div>

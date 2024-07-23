@@ -43,7 +43,7 @@ App\Models\Book::where('title', 'LIKE', '%mot_recherché%')->get();
     Compter le nombre d'enregistrement du modele Book avec une colone supplementaire, comptant le nombre de critiques
 \App\Models\Book::withCount('reviews')->get();
     Meme chose que precedeemnt mais latest = decroissant (p/r created_at) et limite les resultats au 3 livres les plus recent
-\App\Models\Book::withCount('reviews')->latest()->limit(3)->get();
+
 
     L'ordre d'appel de fonction est important sauf pour les fonction d'agregat, on px les mettre dans n'importe quelle ordre car ces fonction effectue
     une operation sur l'ensemble du resultats

@@ -44,7 +44,10 @@ class BookController extends Controller
         // return view('books.index', ['books' => $books]);
         /* #endregion */
         
+        // Requete de base pour recupéré tous les livre
+        // Si $title est non vide, applique le scope 'title' pour filtrer les livres par titre. Sinon, récupère tous les livres.
         $books = Book::when($title, fn($query, $title) => $query->title($title));
+
         // Match est une expression qui ici, compare la valeur de la variable $filter avec les proposition et renvoie une valeur.
         // Celle ci est assignée a la variable $books
         $books = match ($filter) {
