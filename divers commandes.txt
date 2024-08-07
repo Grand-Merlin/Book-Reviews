@@ -1,6 +1,7 @@
 ##############Dans Tinker###################
     Lazy loading : pour les petit jeux de données
 $book = \App\Models\Book::find(42);                         retourne le livre specifier par son id
+$review = \App\Models\Review::findOrFail(54);               retourne la critique specifier par son id
 $reviews = $book->reviews;                                  retourne toutes les critiques pour ce livre
 
     Eager loading : pour les gros jeux de données

@@ -19,4 +19,18 @@ class Review extends Model
         // return $this->belongsTo(Book::class, 'bookCustom_id');
         return $this->belongsTo(Book::class);
     }
+
+    protected static function booted()
+    {
+        // ajoute un gestionnaire d'evenement (ici pour l'evenement update)
+        // l'evenenet update est déclenché chaque fois qu'un enregistrement du model est modifier
+        // Ici, chaque fois qu'une critique est mise a jour, le cache est invalidé.
+        // Cas ou le gestionnaire d'evemenet de sera pas appeler :
+                //Modification directe de la base de données
+                //Utilisation de l'affectation massive (mass assignment)
+                //Utilisation des requêtes SQL brutes (ex: DB::statement ou DB::update)
+                //Transactions de base de données (rollback)
+        static::updated(fn(Review $review) => cache()->forget('book:' . $review->book_id));
+        static::deleted(fn(Review $review) => cache()->forget('book:' . $review->book_id));
+    }
 }

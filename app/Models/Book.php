@@ -26,6 +26,18 @@ class Book extends Model
       return $query->where('title', 'LIKE', '%' . $title . '%');
    }
 
+   public function scopeWithReviewsCount(Builder $query, $from = null, $to = null): Builder
+   {
+      return $query->withCount([
+         'reviews' => fn (Builder $q) => $this->dateRangeFilter($q, $from, $to)
+      ]);
+   }
+
+   public function scopeWithAvgRating(Builder $query, $from = null, $to = null): Builder
+   {
+      return $query->withAvg(['reviews' => fn (Builder $q) => $this->dateRangeFilter($q, $from, $to)], 'rating');
+   }
+
    /* #region V1 */
    // Methode pour compter le nombre de critique sur un livre et affiche le resultat decroissant, de sorte d'avoir les plus populaire en premier
    // public function scopePopular(Builder $query): Builder
@@ -56,13 +68,21 @@ class Book extends Model
    /* #endregion */
 
    /* #region V3 */
+   // public function scopePopular(Builder $query, $from = null, $to = null): Builder
+   // {
+   //    return $query->withCount([
+   //       // fonction anonyme lambda s'ecrit fn et capture automatiquemenet les variable du scope parents (donc pas de use)
+   //       // la limitation d'une lambda est qu'il ne px y avoir qu'une seule expression a l'interieur
+   //       'reviews' => fn (Builder $q) => $this->dateRangeFilter($q, $from, $to)
+   //    ])
+   //       ->orderBy('reviews_count', 'desc');
+   // }
+   /* #endregion */
+
+   /* #region V4 */
    public function scopePopular(Builder $query, $from = null, $to = null): Builder
    {
-      return $query->withCount([
-         // fonction anonyme lambda s'ecrit fn et capture automatiquemenet les variable du scope parents (donc pas de use)
-         // la limitation d'une lambda est qu'il ne px y avoir qu'une seule expression a l'interieur
-         'reviews' => fn (Builder $q) => $this->dateRangeFilter($q, $from, $to)
-      ])
+      return $query->withReviewsCount()
          ->orderBy('reviews_count', 'desc');
    }
    /* #endregion */
@@ -78,7 +98,7 @@ class Book extends Model
    /* #region V2 */
    public function scopeHighestRated(Builder $query, $from = null, $to = null): Builder
    {
-      return $query->withAvg(['reviews' => fn (Builder $q) => $this->dateRangeFilter($q, $from, $to)], 'rating')
+      return $query->withAvgRating()
          ->orderBy('reviews_avg_rating', 'desc');
    }
    /* #endregion */
@@ -104,8 +124,8 @@ class Book extends Model
    public function scopePopularLastMonth(Builder $query): Builder
    {
       return $query->popular(now()->subMonth(), now())
-      ->highestRated(now()->subMonth(), now())
-      ->minReviews(2);
+         ->highestRated(now()->subMonth(), now())
+         ->minReviews(2);
    }
 
    public function scopePopularLast6Months(Builder $query): Builder
@@ -113,23 +133,23 @@ class Book extends Model
       // Methode de la bibliotheque carbon, utilisée pour manipuler des date. submonth = soustrait un mois de cette date.
       // On px egalement preciser le nombre de mois a soustraire entre parenthese
       return $query->popular(now()->subMonths(6), now())
-      ->highestRated(now()->subMonths(6), now())
-      ->minReviews(5);
+         ->highestRated(now()->subMonths(6), now())
+         ->minReviews(5);
    }
 
    public function scopeHighestRatedLastMonth(Builder $query): Builder
    {
       // L'ordre d'appel est important
       return $query->highestRated(now()->subMonth(), now())
-      ->popular(now()->subMonth(), now())
-      ->minReviews(2);
+         ->popular(now()->subMonth(), now())
+         ->minReviews(2);
    }
 
    public function scopeHighestRatedLast6Months(Builder $query): Builder
    {
       // L'ordre d'appel est important
       return $query->highestRated(now()->subMonths(6), now())
-      ->popular(now()->subMonths(6), now())
-      ->minReviews(5);
+         ->popular(now()->subMonths(6), now())
+         ->minReviews(5);
    }
 }
