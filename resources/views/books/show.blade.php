@@ -8,15 +8,19 @@
       <div class="book-author mb-4 text-lg font-semibold">by {{ $book->author }}</div>
       <div class="book-rating flex items-center">
         <div class="mr-2 text-sm font-medium text-slate-700">
-          {{ number_format($book->reviews_avg_rating, 1) }}
+          {{-- {{ number_format($book->reviews_avg_rating, 1) }} --}}
           {{-- le component s'ecrit tjs en minuscule --}}
-          <x-start-rating />
+          <x-start-rating :rating="$book->reviews_avg_rating" />
         </div>
         <span class="book-review-count text-sm text-gray-500">
           {{ $book->reviews_count }} {{ Str::plural('review', $book->reviews_count) }}
         </span>
       </div>
     </div>
+  </div>
+{{-- Ajout d'un ligne qui redirige vers le formulaire pour ajouter une critique --}}
+  <div class="mb-4">
+    <a href="{{route('books.reviews.create', $book)}}" class="reset-link">Ajouter une critique !</a>
   </div>
 
   <div>
@@ -26,7 +30,9 @@
         <li class="book-item mb-4">
           <div>
             <div class="mb-2 flex items-center justify-between">
-              <div class="font-semibold">{{ $review->rating }}</div>
+              {{-- <div class="font-semibold">{{ $review->rating }}</div> --}}
+              {{-- on recupere egalement notre componenet qui affiche les etoiles pour l'adapter sur chaque Reviews --}}
+              <div class="font-semibold"><x-start-rating :rating="$review->rating" /></div>
               <div class="book-review-count">
                 {{ $review->created_at->format('M j, Y') }}</div>
             </div>

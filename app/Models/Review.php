@@ -32,5 +32,6 @@ class Review extends Model
                 //Transactions de base de données (rollback)
         static::updated(fn(Review $review) => cache()->forget('book:' . $review->book_id));
         static::deleted(fn(Review $review) => cache()->forget('book:' . $review->book_id));
+        static::created(fn(Review $review) => cache()->forget('book:' . $review->book_id));
     }
 }

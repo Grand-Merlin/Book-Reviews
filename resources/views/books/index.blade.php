@@ -63,7 +63,9 @@
                 <div>
                   <div class="book-rating">
                     {{-- Formater les nombre avec des separateur de millier. Si le nombre n'est pas un entier, il faut également specifier le nombre de chiffre apres la virgule --}}
-                    {{number_format($book->reviews_avg_rating, 1)}}
+                    {{-- {{number_format($book->reviews_avg_rating, 1)}} --}}
+                    {{-- on utilie egalement le component pour afficher les etoile --}}
+                    <x-start-rating :rating="$book->reviews_avg_rating" />
                   </div>
                   <div class="book-review-count">
                     {{-- la methode Str::plural determine si le mot 'review' dois etre mis au singulier ou au plurier en fonction de la valeur de reviews_count --}}

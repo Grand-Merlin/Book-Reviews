@@ -11,7 +11,10 @@ class StartRating extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    //readonly = imuable (assignée une seule fois et ne change plus)
+    // mettre des propriete dans un constructeur permet d'initialiser ces proriete directmeent a la creation de l'instance de cette classe
+    //le ?avant le float signifie que la propriete peut etre null et optionel
+    public function __construct(public readonly ?float $rating)
     {
         //
     }
