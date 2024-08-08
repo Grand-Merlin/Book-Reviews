@@ -56,7 +56,7 @@ class BookController extends Controller
             'popular_last_6months' => $books->popularLast6Months(),
             'highest_rated_last_month' => $books->highestRatedLastMonth(),
             'highest_rated_last_6months' => $books->highestRatedLast6Months(),
-            default => $books->latest()
+            default => $books->latest()->withAvgRating()->withReviewsCount()
         };
         /* #region V1 sans mise en cache */
         // $books = $books->get();
@@ -104,7 +104,10 @@ class BookController extends Controller
      * Display the specified resource.
      */
     // Laravel utilise l'injection de dépendances pour injecter une instance du modèle Book correspondant à l'ID fourni dans l'URL.
-    public function show(Book $book)
+    // public function show(Book $book)
+
+    //ici on change la signature de la fonction afin de pourvoir utilise des methode statique car (Book $book) est deja un objet
+    public function show(int $id)
     {
         /* #region V1 */
         // On retourne la vue show et on lui passe un tableau associatif contenant le model book
@@ -122,8 +125,14 @@ class BookController extends Controller
         // );
         /* #endregion */
 
-        $cacheKey = 'book:' . $book->id;
-        $book = cache()->remember($cacheKey, 3600, fn () => $book->load(['reviews' => fn ($query) => $query->latest()]));
+        $cacheKey = 'book:' . $id;
+        $book = cache()->remember(
+            $cacheKey,
+            3600,
+            fn () => Book::with([
+                'reviews' => fn ($query) => $query->latest()
+            ])->withAvgRating()->withReviewsCount()->findOrFail($id)
+        );
         return view('books.show', ['book' => $book]);
     }
 
